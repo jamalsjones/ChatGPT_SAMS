@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tool Tracker (SAMS)</title>
+  <style>
+    body { font-family: sans-serif; margin: 40px; background: #fafafa; }
+    h1 { text-align: center; }
+    form, table { max-width: 800px; margin: auto; }
+    form input, form button {
+      margin: 8px 0;
+      padding: 8px;
+      width: 100%;
+      font-size: 1rem;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    th { background-color: #eee; }
+  </style>
+</head>
+<body>
+  <h1>Software Asset Tracker</h1>
+  <form id="toolForm">
+    <input type="text" id="name" placeholder="Tool Name" required />
+    <input type="text" id="category" placeholder="Category" required />
+    <input type="number" id="cost" placeholder="Monthly Cost ($)" required />
+    <input type="date" id="renewal" placeholder="Renewal Date" required />
+    <input type="text" id="owner" placeholder="Owner" required />
+    <button type="submit">Add Tool</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Monthly Cost</th>
+        <th>Renewal Date</th>
+        <th>Owner</th>
+      </tr>
+    </thead>
+    <tbody id="toolList"></tbody>
+  </table>
+
+  <script>
+    const form = document.getElementById('toolForm');
+    const list = document.getElementById('toolList');
+
+    let tools = JSON.parse(localStorage.getItem('tools')) || [];
+
+    const render = () => {
+      list.innerHTML = '';
+      tools.forEach((tool, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${tool.name}</td>
+          <td>${tool.category}</td>
+          <td>$${parseFloat(tool.cost).toFixed(2)}</td>
+          <td>${tool.renewal}</td>
+          <td>${tool.owner}</td>
+        `;
+        list.appendChild(row);
+      });
+    };
+
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const tool = {
+        name: form.name.value,
+        category: form.category.value,
+        cost: form.cost.value,
+        renewal: form.renewal.value,
+        owner: form.owner.value
+      };
+      tools.push(tool);
+      localStorage.setItem('tools', JSON.stringify(tools));
+      form.reset();
+      render();
+    };
+
+    render();
+  </script>
+</body>
+</html>
