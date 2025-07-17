@@ -4,7 +4,8 @@ This is a lightweight HTML/JavaScript web app to track tools and their costs.
 
 ## Features
 - Add tools with name, category, monthly cost, renewal date, and owner
-- Displays everything in a sortable table
+- Displays everything in a table
+- Edit or delete existing entries
 - Stores data in browser (LocalStorage)
 
 ## How to Use

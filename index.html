@@ -17,6 +17,7 @@
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
     th { background-color: #eee; }
+    td.actions button { margin-right: 4px; }
   </style>
 </head>
 <body>
@@ -38,6 +39,7 @@
         <th>Monthly Cost</th>
         <th>Renewal Date</th>
         <th>Owner</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody id="toolList"></tbody>
@@ -46,8 +48,14 @@
   <script>
     const form = document.getElementById('toolForm');
     const list = document.getElementById('toolList');
+    const submitBtn = form.querySelector('button');
 
     let tools = JSON.parse(localStorage.getItem('tools')) || [];
+    let editIndex = null;
+
+    const saveTools = () => {
+      localStorage.setItem('tools', JSON.stringify(tools));
+    };
 
     const render = () => {
       list.innerHTML = '';
@@ -59,9 +67,30 @@
           <td>$${parseFloat(tool.cost).toFixed(2)}</td>
           <td>${tool.renewal}</td>
           <td>${tool.owner}</td>
+          <td class="actions">
+            <button onclick="editTool(${i})">Edit</button>
+            <button onclick="deleteTool(${i})">Delete</button>
+          </td>
         `;
         list.appendChild(row);
       });
+    };
+
+    window.editTool = (i) => {
+      const tool = tools[i];
+      form.name.value = tool.name;
+      form.category.value = tool.category;
+      form.cost.value = tool.cost;
+      form.renewal.value = tool.renewal;
+      form.owner.value = tool.owner;
+      editIndex = i;
+      submitBtn.textContent = 'Update Tool';
+    };
+
+    window.deleteTool = (i) => {
+      tools.splice(i, 1);
+      saveTools();
+      render();
     };
 
     form.onsubmit = (e) => {
@@ -71,10 +100,18 @@
         category: form.category.value,
         cost: form.cost.value,
         renewal: form.renewal.value,
-        owner: form.owner.value
+        owner: form.owner.value,
       };
-      tools.push(tool);
-      localStorage.setItem('tools', JSON.stringify(tools));
+
+      if (editIndex !== null) {
+        tools[editIndex] = tool;
+        editIndex = null;
+        submitBtn.textContent = 'Add Tool';
+      } else {
+        tools.push(tool);
+      }
+
+      saveTools();
       form.reset();
       render();
     };
